@@ -1,45 +1,42 @@
 package dev.skeens.multicastchat;
- 
+
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.InetSocketAddress;
 import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
 import java.util.Enumeration;
 import java.util.Scanner;
 import java.util.concurrent.atomic.AtomicBoolean;
- 
+
 public class BroadcastSender implements Runnable {
     private final int port;
     private final AtomicBoolean running;
- 
+
     public BroadcastSender(int port, AtomicBoolean running) {
         this.port = port;
         this.running = running;
     }
- 
+
     private void broadcast(String message) throws IOException {
         byte[] buffer = message.getBytes();
- 
+
         int interfacesSentTo = 0;
         Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
         while (interfaces.hasMoreElements()) {
             NetworkInterface networkInterface = interfaces.nextElement();
- 
+
             if (!networkInterface.isUp() || networkInterface.isLoopback() || networkInterface.isVirtual()) {
                 continue;
             }
- 
+
             for (InterfaceAddress interfaceAddress : networkInterface.getInterfaceAddresses()) {
-                InetAddress broadcastAddress = interfaceAddress.getBroadcast();
- 
-                if (broadcastAddress == null) continue;
- 
+                if (interfaceAddress.getAddress().getAddress().length != 4) continue;
+
                 try (DatagramSocket socket = new DatagramSocket()) {
                     socket.setBroadcast(true);
- 
+
                     DatagramPacket packet = new DatagramPacket(buffer, buffer.length, InetAddress.getByName("239.255.255.255"), port);
                     socket.send(packet);
                 } catch (IOException e) {
@@ -54,7 +51,7 @@ public class BroadcastSender implements Runnable {
             System.out.println("Broadcast sent to " + interfacesSentTo + " addresses/interfaces.");
         }
     }
- 
+
     @Override
     public void run() {
         try (Scanner scanner = new Scanner(System.in)) {
@@ -64,7 +61,7 @@ public class BroadcastSender implements Runnable {
                     running.set(false);
                     System.exit(1);
                 }
- 
+
                 try {
                     broadcast(line);
                 } catch (IOException e) {
