@@ -22,7 +22,7 @@
                         <configuration>
                             <artifactSet>
                                 <includes>
-                                    <include>org.json::json</include>
+                                    <include>org.json:json</include>
                                 </includes>
                             </artifactSet>
                             <minimizeJar>true</minimizeJar>
