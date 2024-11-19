@@ -79,7 +79,9 @@ public class BroadcastReceiver implements Runnable {
                 UUID messageID = UUID.fromString(jsonObject.getString("message_id"));
                 if (!receivedMessages.add(messageID)) continue;
 
-                this.receivedMessageConsumer.accept(packet.getAddress().getHostAddress(), receivedMessage);
+                String message = jsonObject.getString("message");
+
+                this.receivedMessageConsumer.accept(packet.getAddress().getHostAddress(), message);
                 System.out.println("[" + DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(LocalDateTime.now()) + "] " + packet.getAddress() + " > " + receivedMessage);
             }
         } catch (IOException e) {
