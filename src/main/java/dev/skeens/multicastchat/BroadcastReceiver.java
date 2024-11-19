@@ -65,21 +65,22 @@ public class BroadcastReceiver implements Runnable {
                 }
                 String receivedMessage = new String(packet.getData(), 0, packet.getLength());
                 JSONObject jsonObject;
+                String message;
 
                 try {
                     jsonObject = new JSONObject(receivedMessage);
+
+                    UUID sender = UUID.fromString(jsonObject.getString("sender"));
+                    if (sender.equals(Main.MY_UUID)) continue;
+
+                    UUID messageID = UUID.fromString(jsonObject.getString("message_id"));
+                    if (!receivedMessages.add(messageID)) continue;
+
+                    message = jsonObject.getString("message");
                 } catch (JSONException e) {
                     System.err.println("Invalid JSON received from " + packet.getAddress().getHostAddress() + ": " + receivedMessage);
                     continue;
                 }
-
-                UUID sender = UUID.fromString(jsonObject.getString("sender"));
-                if (sender.equals(Main.MY_UUID)) continue;
-
-                UUID messageID = UUID.fromString(jsonObject.getString("message_id"));
-                if (!receivedMessages.add(messageID)) continue;
-
-                String message = jsonObject.getString("message");
 
                 this.receivedMessageConsumer.accept(packet.getAddress().getHostAddress(), message);
                 System.out.println("[" + DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(LocalDateTime.now()) + "] " + packet.getAddress() + " > " + receivedMessage);
