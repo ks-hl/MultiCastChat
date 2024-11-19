@@ -65,12 +65,12 @@ public class ChatWindow extends JFrame {
 
     public void insertChatMessage(String sender, LocalDateTime time, String message, boolean isHost, boolean success) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
-        ChatMessagePanel chatMessagePanel = new ChatMessagePanel(sender, time.format(formatter), message, isHost);
+        ChatMessagePanel chatMessagePanel = new ChatMessagePanel(sender, time.format(formatter), message, isHost, success);
         JPanel line = new JPanel();
-        if (isHost) line.add(new JPanel());
+        line.setLayout(new BorderLayout());
         line.add(chatMessagePanel, isHost ? BorderLayout.EAST : BorderLayout.WEST);
-        if (!isHost) line.add(new JPanel());
         chatPanel.add(line);
+        chatPanel.add(new JPanel());
         revalidate();
         repaint();
         scrollPane.getVerticalScrollBar().setValue(scrollPane.getVerticalScrollBar().getMaximum());

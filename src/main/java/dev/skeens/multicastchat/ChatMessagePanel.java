@@ -1,30 +1,51 @@
 package dev.skeens.multicastchat;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.BorderFactory;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextArea;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Font;
 
 public class ChatMessagePanel extends JPanel {
-    private final JLabel senderLabel;
-    private final JLabel messageLabel;
 
-    public ChatMessagePanel(String sender, String time, String message, boolean isHost) {
+    public ChatMessagePanel(String sender, String time, String message, boolean isHost, boolean success) {
         setLayout(new BorderLayout());
-        setBackground(isHost ? new Color(0xD9EAD3) : new Color(0xF4F4F4));
+        if (success) {
+            setBackground(isHost ? new Color(0xD9EAD3) : new Color(0xF4F4F4));
+        } else {
+            setBackground(new Color(0xffcccc));
+        }
         setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
 
-        setPreferredSize(new Dimension(400, 60));
-        setMaximumSize(new Dimension(400, Integer.MAX_VALUE));
+        setPreferredSize(new Dimension(350, -1));
+        setMaximumSize(new Dimension(350, -1));
 
-        senderLabel = new JLabel(sender + " " + time);
+        JLabel senderLabel = new JLabel(sender);
         senderLabel.setFont(new Font("Arial", Font.PLAIN, 12));
         senderLabel.setForeground(Color.GRAY);
 
-        messageLabel = new JLabel(message);
+        JLabel timeLabel = new JLabel(time);
+        timeLabel.setFont(new Font("Arial", Font.PLAIN, 12));
+        timeLabel.setForeground(Color.GRAY);
+
+        JPanel header = new JPanel();
+        header.setLayout(new BorderLayout());
+        header.setBackground(getBackground());
+        header.add(senderLabel, BorderLayout.WEST);
+        header.add(timeLabel, BorderLayout.EAST);
+
+        JTextArea messageLabel = new JTextArea(message);
+        messageLabel.setEditable(false);
+        messageLabel.setLineWrap(true);
         messageLabel.setFont(new Font("Arial", Font.PLAIN, 14));
         messageLabel.setOpaque(true);
         messageLabel.setBackground(getBackground());
 
-        add(senderLabel, BorderLayout.NORTH);
+        add(header, BorderLayout.PAGE_START);
         add(messageLabel, BorderLayout.CENTER);
 
         if (isHost) {
