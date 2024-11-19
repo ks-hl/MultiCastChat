@@ -10,16 +10,8 @@ import java.util.Enumeration;
 import java.util.Scanner;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class BroadcastSender implements Runnable {
-    private final int port;
-    private final AtomicBoolean running;
-
-    public BroadcastSender(int port, AtomicBoolean running) {
-        this.port = port;
-        this.running = running;
-    }
-
-    private void broadcast(String message) throws IOException {
+public class BroadcastSender {
+    public static void broadcast(String message, int port) throws IOException {
         byte[] buffer = message.getBytes();
 
         int interfacesSentTo = 0;
@@ -49,25 +41,6 @@ public class BroadcastSender implements Runnable {
             System.err.println("No interfaces to broadcast to.");
         } else {
             System.out.println("Broadcast sent to " + interfacesSentTo + " addresses/interfaces.");
-        }
-    }
-
-    @Override
-    public void run() {
-        try (Scanner scanner = new Scanner(System.in)) {
-            while (running.get()) {
-                String line = scanner.nextLine();
-                if (line.equals("exit")) {
-                    running.set(false);
-                    System.exit(1);
-                }
-
-                try {
-                    broadcast(line);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
         }
     }
 }
