@@ -1,18 +1,25 @@
 package dev.skeens.multicastchat;
 
+import org.json.JSONObject;
+
 import java.io.IOException;
 import java.net.DatagramPacket;
-import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InterfaceAddress;
+import java.net.MulticastSocket;
 import java.net.NetworkInterface;
 import java.util.Enumeration;
-import java.util.Scanner;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.UUID;
 
 public class BroadcastSender {
-    public static void broadcast(String message, int port) throws IOException {
-        byte[] buffer = message.getBytes();
+
+    public static void broadcast(String messageText, int port) throws IOException {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("sender", Main.MY_UUID);
+        jsonObject.put("message_id", UUID.randomUUID());
+        jsonObject.put("message", messageText);
+
+        byte[] buffer = jsonObject.toString().getBytes();
 
         int interfacesSentTo = 0;
         Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
@@ -26,8 +33,8 @@ public class BroadcastSender {
             for (InterfaceAddress interfaceAddress : networkInterface.getInterfaceAddresses()) {
                 if (interfaceAddress.getAddress().getAddress().length != 4) continue;
 
-                try (DatagramSocket socket = new DatagramSocket()) {
-                    socket.setBroadcast(true);
+                try (MulticastSocket socket = new MulticastSocket()) {
+                    socket.setNetworkInterface(networkInterface);
 
                     DatagramPacket packet = new DatagramPacket(buffer, buffer.length, InetAddress.getByName("239.255.255.255"), port);
                     socket.send(packet);

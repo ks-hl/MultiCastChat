@@ -11,7 +11,9 @@ public class ChatMessagePanel extends JPanel {
         setLayout(new BorderLayout());
         setBackground(isHost ? new Color(0xD9EAD3) : new Color(0xF4F4F4));
         setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
-        setPreferredSize(new Dimension(580, 60));
+
+        setPreferredSize(new Dimension(400, 60));
+        setMaximumSize(new Dimension(400, Integer.MAX_VALUE));
 
         senderLabel = new JLabel(sender + " " + time);
         senderLabel.setFont(new Font("Arial", Font.PLAIN, 12));

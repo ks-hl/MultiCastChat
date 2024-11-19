@@ -1,5 +1,8 @@
 package dev.skeens.multicastchat;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetSocketAddress;
@@ -8,6 +11,9 @@ import java.net.NetworkInterface;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
@@ -16,6 +22,7 @@ public class BroadcastReceiver implements Runnable {
     private final int port;
     private final AtomicBoolean running;
     private final BiConsumer<String, String> receivedMessageConsumer;
+    private final Set<UUID> receivedMessages = new HashSet<>();
 
     public BroadcastReceiver(int port, AtomicBoolean running, BiConsumer<String, String> receivedMessageConsumer) {
         this.port = port;
@@ -57,6 +64,20 @@ public class BroadcastReceiver implements Runnable {
                     continue;
                 }
                 String receivedMessage = new String(packet.getData(), 0, packet.getLength());
+                JSONObject jsonObject;
+
+                try {
+                    jsonObject = new JSONObject(receivedMessage);
+                } catch (JSONException e) {
+                    System.err.println("Invalid JSON received from " + packet.getAddress().getHostAddress() + ": " + receivedMessage);
+                    continue;
+                }
+
+                UUID sender = UUID.fromString(jsonObject.getString("sender"));
+                if (sender.equals(Main.MY_UUID)) continue;
+
+                UUID messageID = UUID.fromString(jsonObject.getString("message_id"));
+                if (!receivedMessages.add(messageID)) continue;
 
                 this.receivedMessageConsumer.accept(packet.getAddress().getHostAddress(), receivedMessage);
                 System.out.println("[" + DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(LocalDateTime.now()) + "] " + packet.getAddress() + " > " + receivedMessage);

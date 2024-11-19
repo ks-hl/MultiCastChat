@@ -3,10 +3,12 @@ package dev.skeens.multicastchat;
 import javax.swing.SwingUtilities;
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Main {
     private static final int PORT = 3335;
+    public static final UUID MY_UUID = UUID.randomUUID();
 
     public static void main(String[] args) {
         AtomicBoolean running = new AtomicBoolean(true);

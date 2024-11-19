@@ -1,7 +1,14 @@
 package dev.skeens.multicastchat;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextField;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -59,7 +66,11 @@ public class ChatWindow extends JFrame {
     public void insertChatMessage(String sender, LocalDateTime time, String message, boolean isHost, boolean success) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
         ChatMessagePanel chatMessagePanel = new ChatMessagePanel(sender, time.format(formatter), message, isHost);
-        chatPanel.add(chatMessagePanel);
+        JPanel line = new JPanel();
+        if (isHost) line.add(new JPanel());
+        line.add(chatMessagePanel, isHost ? BorderLayout.EAST : BorderLayout.WEST);
+        if (!isHost) line.add(new JPanel());
+        chatPanel.add(line);
         revalidate();
         repaint();
         scrollPane.getVerticalScrollBar().setValue(scrollPane.getVerticalScrollBar().getMaximum());
